@@ -52,8 +52,8 @@ export default function Home() {
         className="absolute inset-0 flex justify-center items-center z-0"
         style={{ backgroundColor: "rgba(255,255,255,0.85)" }}
       >
-        <img
-          src="/src/assets/PLSP Banner New (1)-min.png"
+        
+          <img src="/PLSP Banner New (1)-min.png" />
           alt="Background"
           className="w-full h-full object-contain opacity-40"
         />
@@ -62,8 +62,7 @@ export default function Home() {
       {/* Header */}
       <header className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between p-6 z-10">
         <div className="flex items-center gap-4 mb-6 sm:mb-0 ml-[-60px]">
-          <img
-            src="/src/assets/logo.png"
+         <img src="/logo.png" />
             alt="Logo"
             className="w-72 h-auto drop-shadow-[0_0_10px_rgba(0,132,61,0.4)]"
           />
