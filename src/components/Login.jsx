@@ -1,39 +1,33 @@
 
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/images__1_-removebg-preview.png"; // ✅ Import your logo image
-
-// Mock login logic
-const mockLogin = ({ role, username, password }) => {
-  if (role === "admin" && username === "rameez" && password === "rameez123") {
-    return { success: true, role: "admin", userId: "admin-rameez" };
-  }
-  if (role === "employee" && username === "user" && password === "user123") {
-    return { success: true, role: "employee", userId: "employee-user" };
-  }
-  return { success: false };
-};
+import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "../firebase";
+import logo from "../assets/images__1_-removebg-preview.png"; // ✅ Your logo
 
 export default function Login() {
   const navigate = useNavigate();
+  const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState("employee");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const result = mockLogin({ role, username, password });
+    try {
+      if (isRegister) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
 
-    if (result.success) {
-      const userData = { username, role: result.role, userId: result.userId };
-      localStorage.setItem("mockAuth", JSON.stringify(userData));
-      navigate("/"); // redirect to home
-    } else {
-      setError("Invalid credentials. Try admin/rameez123 or user/user123");
+      const userData = { email, role };
+      localStorage.setItem("authUser", JSON.stringify(userData));
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -69,7 +63,7 @@ export default function Login() {
             THE AGHA KHAN UNIVERSITY
           </h2>
           <p className="text-gray-500 text-sm">
-            Please sign in to access your dashboard
+            {isRegister ? "Create your account" : "Please sign in to access your dashboard"}
           </p>
         </div>
 
@@ -94,10 +88,10 @@ export default function Login() {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
             required
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-700 outline-none text-gray-800 placeholder-gray-400"
           />
@@ -122,16 +116,17 @@ export default function Login() {
             type="submit"
             className="w-full bg-emerald-700 text-white p-3 rounded-lg font-semibold shadow-md hover:bg-emerald-800 transition"
           >
-            Sign In
+            {isRegister ? "Sign Up" : "Sign In"}
           </motion.button>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="text-sm text-gray-600 text-center mt-6">
-          <p>Demo Credentials:</p>
-          <p className="font-mono mt-1">
-            user / user123 <span className="text-gray-400">|</span> rameez /
-            rameez123
+        {/* Toggle Sign In / Sign Up */}
+        <div className="text-center mt-4">
+          <p
+            className="text-emerald-700 cursor-pointer text-sm hover:underline"
+            onClick={() => setIsRegister(!isRegister)}
+          >
+            {isRegister ? "Already have an account? Sign In" : "New user? Create an account"}
           </p>
         </div>
       </motion.div>
