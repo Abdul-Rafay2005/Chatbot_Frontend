@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
-const MOCK_AUTH_KEY = "mockAuth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../firebase"; // ✅ make sure this path is correct
 
 const SignOutIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -26,26 +26,24 @@ export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  // ✅ Check Firebase Auth state
   useEffect(() => {
-    const authData = localStorage.getItem(MOCK_AUTH_KEY);
-    if (authData) {
-      try {
-        setUser(JSON.parse(authData));
-      } catch {
-        localStorage.removeItem(MOCK_AUTH_KEY);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
         navigate("/login");
       }
-    } else {
-      navigate("/login");
-    }
+    });
+    return () => unsubscribe();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem(MOCK_AUTH_KEY);
+  const handleLogout = async () => {
+    await signOut(auth);
     navigate("/login");
   };
 
-  if (!user) return null;
+  if (!user) return null; // wait for Firebase to load
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-gray-900 relative overflow-hidden">
@@ -72,14 +70,15 @@ export default function Home() {
           <div className="text-left">
             <p className="text-xl text-gray-600 font-medium">Dashboard</p>
             <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00843D] to-[#00632d] bg-clip-text text-transparent">
-              Welcome, {user.username}
-            </h1>
+  Welcome, {user.email ? user.email.split("@")[0] : "User"}
+</h1>
+
           </div>
         </div>
 
         <div className="flex flex-col items-center sm:items-end">
           <p className="text-sm text-gray-600 mb-2 z-10">
-            Logged in as: {user.role}
+            Logged in with Firebase
           </p>
           <motion.button
             whileHover={{ scale: 1.05 }}
