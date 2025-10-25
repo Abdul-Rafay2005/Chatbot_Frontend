@@ -1,131 +1,9 @@
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-// import { motion } from "framer-motion";
-
-// const MOCK_AUTH_KEY = 'mockAuth';
-
-// const getCurrentUser = () => {
-//   const authData = localStorage.getItem(MOCK_AUTH_KEY);
-//   if (authData) {
-//     try {
-//       return JSON.parse(authData);
-//     } catch {
-//       return null;
-//     }
-//   }
-//   return null;
-// };
-
-// const logout = () => {
-//   localStorage.removeItem(MOCK_AUTH_KEY);
-// };
-
-// // SVG Icon for Sign Out
-// const SignOutIcon = (props) => (
-//   <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-//     <path
-//       fill="currentColor"
-//       d="M160 96c17.7 0 32-14.3 32-32s-14.3-32-32-32H128C57.3 32 0 89.3 0 160V416c0 70.7 
-//       57.3 128 128 128h32c17.7 0 32-14.3 32-32s-14.3-32-32-32H128c-35.3 0-64-28.7-64-64V160c0-35.3 
-//       28.7-64 64-64h32zm272 0c-17.7 0-32 14.3-32 32V224c0 17.7 14.3 32 32 32c17.7 0 32-14.3 
-//       32-32V128c0-17.7-14.3-32-32-32zm48 16c0-8.8-7.2-16-16-16H304c-8.8 0-16 7.2-16 
-//       16v16c0 8.8 7.2 16 16 16h88.7L256.7 392.7c-6.2 6.2-6.2 16.4 
-//       0 22.6l22.6 22.6c6.2 6.2 16.4 6.2 22.6 0L496 
-//       226.6V400c0 8.8-7.2 16-16 16h-16c-8.8 
-//       0-16 7.2-16 16s7.2 16 16 
-//       16h32c8.8 0 16-7.2 16-16V128c0-35.3-28.7-64-64-64H384c-17.7 
-//       0-32 14.3-32 32z"
-//     />
-//   </svg>
-// );
-
-// export default function Home() {
-//   const navigate = useNavigate();
-//   const user = getCurrentUser();
-
-//   const displayUsername = user ? user.username : "Guest";
-//   const displayRole = user ? user.role : "guest";
-
-//   return (
-//     <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-gray-900 relative overflow-hidden">
-//       {/* --- Background --- */}
-//       <div
-//   className="absolute inset-0 flex justify-center items-center z-0"
-//   style={{
-//     backgroundColor: "rgba(255,255,255,0.85)",
-//   }}
-// >
-//   <img
-//     src="/src/assets/PLSP Banner New (1)-min.png"
-//     alt="Background"
-//     className="w-full h-full object-contain opacity-40"
-//   />
-// </div>
-
-// {/* --- Header --- */}
-// <header className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between p-6 z-10">
-//   <div className="flex items-center gap-4 mb-6 sm:mb-0 ml-[-60px]">
-//     <img
-//       src="/src/assets/logo.png"
-//       alt="Logo"
-//       className="w-72 h-auto drop-shadow-[0_0_10px_rgba(0,132,61,0.4)]"
-//     />
-//     <div className="text-left">
-//       <p className="text-xl text-gray-600 font-medium">Dashboard</p>
-//       <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00843D] to-[#00632d] bg-clip-text text-transparent">
-//         Welcome, {displayUsername}
-//       </h1>
-//     </div>
-//   </div>
-
-//   <div className="flex flex-col items-center sm:items-end">
-//     <p className="text-sm text-gray-600 mb-2 z-10">
-//       Logged in as: {displayRole}
-//     </p>
-//     <motion.button
-//       whileHover={{ scale: 1.05 }}
-//       whileTap={{ scale: 0.95 }}
-//       onClick={() => {
-//         logout();
-//         navigate("/login");
-//       }}
-//       className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#00843D] to-[#00632d] text-white font-semibold shadow-md hover:shadow-[#00843D]/50 transition z-10"
-//     >
-//       <SignOutIcon className="w-5 h-5" /> Sign Out
-//     </motion.button>
-//   </div>
-// </header>
-
-
-// {/* --- Centered Button --- */}
-// <div className="flex-grow flex items-center justify-center w-full z-10">
-//   <motion.button
-//     whileHover={{ scale: 1.03 }}
-//     whileTap={{ scale: 0.98 }}
-//     onClick={() => navigate("/chat")}
-//     className="px-20 py-2.5 rounded-full bg-gradient-to-r from-[#00843D] to-[#00632d] 
-//                text-white font-semibold text-lg shadow-md hover:shadow-[#00843D]/40 
-//                transition tracking-wide"
-//   >
-//     Launch Chat
-//   </motion.button>
-// </div>
-
-
-//       {/* --- Footer spacing --- */}
-//       <div className="h-12"></div>
-//     </div>
-//   );
-// }
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const MOCK_AUTH_KEY = "mockAuth";
 
-// SVG Icon for Sign Out
 const SignOutIcon = (props) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
     <path
@@ -148,7 +26,6 @@ export default function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // ✅ Check if user is logged in
   useEffect(() => {
     const authData = localStorage.getItem(MOCK_AUTH_KEY);
     if (authData) {
@@ -163,17 +40,16 @@ export default function Home() {
     }
   }, [navigate]);
 
-  // ✅ Handle logout
   const handleLogout = () => {
     localStorage.removeItem(MOCK_AUTH_KEY);
     navigate("/login");
   };
 
-  if (!user) return null; // Prevent flashing before redirect
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-gray-900 relative overflow-hidden">
-      {/* --- Background --- */}
+      {/* Background Banner */}
       <div
         className="absolute inset-0 flex justify-center items-center z-0"
         style={{ backgroundColor: "rgba(255,255,255,0.85)" }}
@@ -185,7 +61,7 @@ export default function Home() {
         />
       </div>
 
-      {/* --- Header --- */}
+      {/* Header */}
       <header className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between p-6 z-10">
         <div className="flex items-center gap-4 mb-6 sm:mb-0 ml-[-60px]">
           <img
@@ -216,7 +92,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* --- Centered Button --- */}
+      {/* Launch Chat Button */}
       <div className="flex-grow flex items-center justify-center w-full z-10">
         <motion.button
           whileHover={{ scale: 1.03 }}
@@ -230,7 +106,6 @@ export default function Home() {
         </motion.button>
       </div>
 
-      {/* --- Footer spacing --- */}
       <div className="h-12"></div>
     </div>
   );
