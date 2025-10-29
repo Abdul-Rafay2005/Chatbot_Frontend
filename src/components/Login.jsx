@@ -2,8 +2,14 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "../firebase";
-import logo from "../assets/images__1_-removebg-preview.png"; // ✅ Your logo
+import { 
+  auth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  db 
+} from "../firebase"; // Make sure you export Firestore db
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import logo from "../assets/images__1_-removebg-preview.png";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,16 +22,47 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
       if (isRegister) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
+        // 1️⃣ Create Firebase Auth account
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
 
-      const userData = { email, role };
-      localStorage.setItem("authUser", JSON.stringify(userData));
-      navigate("/");
+        // 2️⃣ Add user to Firestore with isApproved: false
+        await setDoc(doc(db, "users", uid), {
+          email,
+          role,
+          isApproved: false, // must be approved by admin
+        });
+
+        alert(
+          "Your account request has been submitted. You will receive access once approved by admin."
+        );
+        setEmail("");
+        setPassword("");
+        setIsRegister(false); // redirect to login
+      } else {
+        // 3️⃣ Login
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        // 4️⃣ Check approval in Firestore
+        const userDoc = await getDoc(doc(db, "users", uid));
+        if (!userDoc.exists()) throw new Error("User not found in database");
+
+        const userData = userDoc.data();
+
+        if (!userData.isApproved) {
+          throw new Error(
+            "Your account is not approved yet. Please wait for admin approval."
+          );
+        }
+
+        // 5️⃣ Save to local storage and navigate
+        localStorage.setItem("authUser", JSON.stringify({ email, role: userData.role }));
+        navigate("/");
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -43,7 +80,7 @@ export default function Login() {
         transition={{ duration: 0.6 }}
         className="z-10 w-full max-w-md p-10 bg-white rounded-3xl shadow-2xl border border-gray-100"
       >
-        {/* ✅ Logo Section */}
+        {/* Logo */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -57,10 +94,10 @@ export default function Login() {
           />
         </motion.div>
 
-        {/* Title & Subtitle */}
+        {/* Title */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-emerald-800 mb-2">
-            THE AGA KHAN UNIVERSITY
+            THE AGHA KHAN UNIVERSITY
           </h2>
           <p className="text-gray-500 text-sm">
             {isRegister ? "Create your account" : "Please sign in to access your dashboard"}
@@ -85,7 +122,7 @@ export default function Login() {
           ))}
         </div>
 
-        {/* Login Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
@@ -120,7 +157,6 @@ export default function Login() {
           </motion.button>
         </form>
 
-        {/* Toggle Sign In / Sign Up */}
         <div className="text-center mt-4">
           <p
             className="text-emerald-700 cursor-pointer text-sm hover:underline"
