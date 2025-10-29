@@ -1,10 +1,12 @@
+
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
 
-// ✅ Import images from src/assets (Vite will bundle them correctly)
+// ✅ Import images
 import banner from "../assets/PLSP Banner New (1)-min.png";
 import logo from "../assets/logo.png";
 
@@ -31,27 +33,37 @@ const SignOutIcon = (props) => (
 
 export default function Home() {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
 
-  // ✅ Firebase Auth listener
+  // ✅ Check Firebase Auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) setUser(currentUser);
-      else navigate("/login");
+      if (!currentUser) navigate("/login");
     });
     return () => unsubscribe();
   }, [navigate]);
 
+  // ✅ Load user info from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem("authUser");
+    if (storedUser) {
+      setUserData(JSON.parse(storedUser));
+    } else {
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const handleLogout = async () => {
     await signOut(auth);
+    localStorage.removeItem("authUser");
     navigate("/login");
   };
 
-  if (!user) return null; // wait for Firebase to load
+  if (!userData) return null; // wait for localStorage
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-gray-900 relative overflow-hidden">
-      {/* ✅ Background Banner */}
+      {/* Background Banner */}
       <div
         className="absolute inset-0 flex justify-center items-center z-0"
         style={{ backgroundColor: "rgba(255,255,255,0.85)" }}
@@ -63,7 +75,7 @@ export default function Home() {
         />
       </div>
 
-      {/* ✅ Header Section */}
+      {/* Header Section */}
       <header className="w-full max-w-5xl flex flex-col sm:flex-row items-center justify-between p-6 z-10">
         <div className="flex items-center gap-4 mb-6 sm:mb-0 ml-[-60px]">
           <img
@@ -74,15 +86,13 @@ export default function Home() {
           <div className="text-left">
             <p className="text-xl text-gray-600 font-medium">Dashboard</p>
             <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#00843D] to-[#00632d] bg-clip-text text-transparent">
-              Welcome, {user.email ? user.email.split("@")[0] : "User"}
+              Welcome, {userData.username || "User"}!
             </h1>
           </div>
         </div>
 
         <div className="flex flex-col items-center sm:items-end">
-          <p className="text-sm text-gray-600 mb-2 z-10">
-            Logged in with Firebase
-          </p>
+          <p className="text-sm text-gray-600 mb-2 z-10">Logged in with Firebase</p>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -94,7 +104,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ✅ Launch Chat Button */}
+      {/* Launch Chat Button */}
       <div className="flex-grow flex items-center justify-center w-full z-10">
         <motion.button
           whileHover={{ scale: 1.03 }}
