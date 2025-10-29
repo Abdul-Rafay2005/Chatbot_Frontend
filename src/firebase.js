@@ -1,7 +1,11 @@
+
+
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
+// ✅ Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCWSesJBDvC2oNSL9UObSVwoEAOzJobAWY",
   authDomain: "chatbot-dc309.firebaseapp.com",
@@ -12,6 +16,14 @@ const firebaseConfig = {
   measurementId: "G-6Q1SE7GD6D",
 };
 
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// ✅ Auth
 export const auth = getAuth(app);
+
+// ✅ Firestore
+export const db = getFirestore(app);
+
+// ✅ Export auth functions directly
 export { signInWithEmailAndPassword, createUserWithEmailAndPassword };
