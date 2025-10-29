@@ -1,13 +1,7 @@
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  auth, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  db 
-} from "../firebase"; // Make sure you export Firestore db
+import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, db } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import logo from "../assets/images__1_-removebg-preview.png";
 
@@ -15,6 +9,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
   const [role, setRole] = useState("employee");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,19 +24,21 @@ export default function Login() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const uid = userCredential.user.uid;
 
-        // 2️⃣ Add user to Firestore with isApproved: false
+        // 2️⃣ Save user in Firestore with username & isApproved: false
         await setDoc(doc(db, "users", uid), {
+          username,
           email,
           role,
-          isApproved: false, // must be approved by admin
+          isApproved: false,
         });
 
         alert(
           "Your account request has been submitted. You will receive access once approved by admin."
         );
+        setUsername("");
         setEmail("");
         setPassword("");
-        setIsRegister(false); // redirect to login
+        setIsRegister(false); // switch to login
       } else {
         // 3️⃣ Login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -52,16 +49,16 @@ export default function Login() {
         if (!userDoc.exists()) throw new Error("User not found in database");
 
         const userData = userDoc.data();
-
         if (!userData.isApproved) {
-          throw new Error(
-            "Your account is not approved yet. Please wait for admin approval."
-          );
+          throw new Error("Your account is not approved yet. Please wait for admin approval.");
         }
 
-        // 5️⃣ Save to local storage and navigate
-        localStorage.setItem("authUser", JSON.stringify({ email, role: userData.role }));
-        navigate("/");
+        // 5️⃣ Save user info including username to localStorage
+        localStorage.setItem(
+          "authUser",
+          JSON.stringify({ username: userData.username, email, role: userData.role })
+        );
+        navigate("/"); // redirect to dashboard/home
       }
     } catch (err) {
       setError(err.message);
@@ -124,6 +121,16 @@ export default function Login() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isRegister && (
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-700 outline-none text-gray-800 placeholder-gray-400"
+            />
+          )}
           <input
             type="email"
             value={email}
