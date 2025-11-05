@@ -94,7 +94,7 @@ export default function Login() {
         {/* Title */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-emerald-800 mb-2">
-            THE AGHA KHAN UNIVERSITY
+            THE AGA KHAN UNIVERSITY
           </h2>
           <p className="text-gray-500 text-sm">
             {isRegister ? "Create your account" : "Please sign in to access your dashboard"}
